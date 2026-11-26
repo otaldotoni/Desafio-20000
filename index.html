@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Desafio 200">
+<title>Desafio 200</title>
+<style>
+:root{--bg:#f6ece4;--fg:#1d1a17;--cell:#fffaf5;--line:#c9b6a6;--on:#2f7d4f;--onfg:#fff;--mut:#7a6a5d;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1b1714;--fg:#f3e9e0;--cell:#26211d;--line:#4a3f37;--mut:#a8998c}}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--on:#3f9d63}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;padding:16px 12px 32px;max-width:640px;margin-inline:auto}
+h1{font-size:26px;margin:0 0 2px}
+.sub{color:var(--mut);font-size:14px;margin:0 0 12px}
+input[type=text]{width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--cell);color:var(--fg);font-size:16px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}
+.stat{background:var(--cell);border:1px solid var(--line);border-radius:12px;padding:10px}
+.stat small{display:block;color:var(--mut);font-size:12px}
+.stat b{font-size:18px}
+.bar{height:10px;background:var(--line);border-radius:6px;overflow:hidden;margin-bottom:12px}
+.bar i{display:block;height:100%;width:0;background:var(--on);transition:width .25s}
+.grid{display:grid;grid-template-columns:repeat(10,1fr);gap:3px}
+.grid button{aspect-ratio:1;padding:0;border:1px solid var(--line);background:var(--cell);color:var(--fg);border-radius:5px;font-size:clamp(9px,2.6vw,13px);font-weight:600;cursor:pointer}
+.grid button.on{background:var(--on);color:var(--onfg);border-color:var(--on);text-decoration:line-through}
+.row{display:flex;gap:8px;margin-top:14px}
+.row button{flex:1;padding:12px;border-radius:10px;border:1px solid var(--line);background:var(--cell);color:var(--fg);font-size:15px}
+@media print{.row,input{display:none}body{background:#fff;color:#000}}
+</style>
+</head>
+<body>
+<h1>Monte seu pé de meia</h1>
+<p class="sub">Desafio dos 200 depósitos · toque no número depois de depositar</p>
+<input type="text" id="obj" placeholder="Meu objetivo: ex. viagem, reserva de emergência…">
+<div class="stats">
+<div class="stat"><small>Guardado</small><b id="saved">R$ 0</b></div>
+<div class="stat"><small>Falta</small><b id="left">R$ 20.100</b></div>
+<div class="stat"><small>Depósitos feitos</small><b id="cnt">0 / 200</b></div>
+<div class="stat"><small>Meta total</small><b>R$ 20.100,00</b></div>
+</div>
+<div class="bar"><i id="pg"></i></div>
+<div class="grid" id="g"></div>
+<div class="row"><button id="rs">Limpar tudo</button><button onclick="window.print()">Imprimir</button></div>
+<script>
+var K="desafio200",st={done:[],obj:""},TOTAL=20100;
+try{var r=localStorage.getItem(K);if(r){var p=JSON.parse(r);if(p&&Array.isArray(p.done))st=p}}catch(e){}
+function save(){try{localStorage.setItem(K,JSON.stringify(st))}catch(e){}}
+function brl(n){return "R$ "+n.toLocaleString("pt-BR")}
+var g=document.getElementById("g");
+for(var i=1;i<=200;i++){(function(n){var b=document.createElement("button");b.textContent=n;b.dataset.n=n;
+if(st.done.indexOf(n)>-1)b.className="on";
+b.onclick=function(){var k=st.done.indexOf(n);if(k>-1){st.done.splice(k,1);b.className=""}else{st.done.push(n);b.className="on"}save();upd()};
+g.appendChild(b)})(i)}
+var o=document.getElementById("obj");o.value=st.obj||"";o.oninput=function(){st.obj=o.value;save()};
+document.getElementById("rs").onclick=function(){if(confirm("Limpar todos os depósitos marcados?")){st.done=[];save();[].forEach.call(g.children,function(b){b.className=""});upd()}};
+function upd(){var s=st.done.reduce(function(a,b){return a+b},0);
+document.getElementById("saved").textContent=brl(s);
+document.getElementById("left").textContent=brl(TOTAL-s);
+document.getElementById("cnt").textContent=st.done.length+" / 200";
+document.getElementById("pg").style.width=(s/TOTAL*100)+"%"}
+upd();
+</script>
+</body>
+</html>
